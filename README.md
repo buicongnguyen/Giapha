@@ -5,6 +5,7 @@ Giapha is a local-first family tree and family-state tracker inspired by common 
 ## Features
 
 - Visual family tree with parent-child and partner links
+- Gender-colored person nodes with wellbeing state markers
 - Search and filters by life status and wellbeing
 - Editable profile state for each person
 - Add parent, partner, or child from the selected profile

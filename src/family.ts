@@ -156,7 +156,7 @@ export function addRelative(people: Person[], baseId: string, draft: Relationshi
     id: makeId("person"),
     givenName: draft.givenName.trim(),
     familyName: draft.familyName.trim(),
-    gender: "unknown",
+    gender: draft.gender,
     birthDate: "",
     deathDate: "",
     location: draft.location.trim(),

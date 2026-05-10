@@ -346,6 +346,7 @@ button {
 .profile-avatar {
   display: grid;
   place-items: center;
+  position: relative;
   border-radius: 50%;
   color: #fff;
   font-weight: 900;
@@ -362,6 +363,39 @@ button {
   height: 70px;
   flex: 0 0 auto;
   font-size: 1.3rem;
+}
+
+.gender-female {
+  background: #b8577a;
+}
+
+.gender-male {
+  background: #4468a9;
+}
+
+.gender-nonbinary {
+  background: #2f7d75;
+}
+
+.gender-unknown {
+  background: #78817d;
+}
+
+.state-dot {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.state-dot.large {
+  width: 16px;
+  height: 16px;
+  right: 4px;
+  bottom: 4px;
 }
 
 .thriving {
@@ -422,17 +456,37 @@ button {
   outline: none;
 }
 
-.tree-card rect {
+.tree-card .tree-node-bg {
   fill: #fff;
   stroke: #cfd7d1;
   stroke-width: 1.4;
   filter: drop-shadow(0 8px 16px rgba(25, 35, 31, 0.1));
 }
 
-.tree-card:hover rect,
-.tree-card.selected rect {
+.tree-card:hover .tree-node-bg,
+.tree-card.selected .tree-node-bg {
   stroke: var(--teal);
   stroke-width: 3;
+}
+
+.tree-card.gender-female .tree-gender-band,
+.tree-card.gender-female .tree-avatar {
+  fill: #b8577a;
+}
+
+.tree-card.gender-male .tree-gender-band,
+.tree-card.gender-male .tree-avatar {
+  fill: #4468a9;
+}
+
+.tree-card.gender-nonbinary .tree-gender-band,
+.tree-card.gender-nonbinary .tree-avatar {
+  fill: #2f7d75;
+}
+
+.tree-card.gender-unknown .tree-gender-band,
+.tree-card.gender-unknown .tree-avatar {
+  fill: #78817d;
 }
 
 .tree-avatar {
@@ -440,23 +494,28 @@ button {
   stroke-width: 2;
 }
 
-.tree-avatar.thriving {
+.tree-state-dot {
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.tree-state-dot.thriving {
   fill: var(--teal);
 }
 
-.tree-avatar.stable {
+.tree-state-dot.stable {
   fill: var(--indigo);
 }
 
-.tree-avatar.needs-attention {
+.tree-state-dot.needs-attention {
   fill: var(--gold);
 }
 
-.tree-avatar.critical {
+.tree-state-dot.critical {
   fill: var(--coral);
 }
 
-.tree-avatar.unknown {
+.tree-state-dot.unknown {
   fill: #78817d;
 }
 

@@ -94,6 +94,7 @@ export interface RelationshipDraft {
   relation: "parent" | "partner" | "child";
   givenName: string;
   familyName: string;
+  gender: Person["gender"];
   vitalStatus: VitalStatus;
   wellbeing: WellbeingState;
   location: string;

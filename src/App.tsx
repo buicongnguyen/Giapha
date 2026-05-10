@@ -79,6 +79,13 @@ const contactLabels: Record<ContactState, string> = {
   unknown: "Unknown",
 };
 
+const genderLabels: Record<Person["gender"], string> = {
+  female: "Female",
+  male: "Male",
+  nonbinary: "Nonbinary",
+  unknown: "Unknown",
+};
+
 const eventTypeLabels: Record<EventType, string> = {
   birth: "Birth",
   death: "Death",
@@ -114,6 +121,7 @@ const emptyRelationshipDraft: RelationshipDraft = {
   relation: "child",
   givenName: "",
   familyName: "",
+  gender: "unknown",
   vitalStatus: "living",
   wellbeing: "unknown",
   location: "",
@@ -267,8 +275,24 @@ function App() {
 
   const handleDeletePerson = () => {
     if (!selectedPerson || people.length <= 1) return;
+    const confirmed = window.confirm(
+      `Delete ${getFullName(selectedPerson)} from this family tree? This removes their links from relatives and sources.`,
+    );
+    if (!confirmed) return;
+
     const nextPeople = removePerson(people, selectedPerson.id);
-    commitPeople(nextPeople, nextPeople[0]?.id ?? "");
+    setStore((current) => ({
+      ...current,
+      people: normalizeRelationshipLinks(nextPeople),
+      sources: sources
+        .map((source) => ({
+          ...source,
+          linkedPersonIds: source.linkedPersonIds.filter((id) => id !== selectedPerson.id),
+        }))
+        .filter((source) => source.linkedPersonIds.length > 0),
+      selectedPersonId: nextPeople[0]?.id ?? "",
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
   const exportJson = (publicOnly = false) => {
@@ -411,7 +435,10 @@ function App() {
                 onClick={() => setStore((current) => ({ ...current, selectedPersonId: person.id }))}
                 type="button"
               >
-                <span className={`avatar ${person.wellbeing}`}>{getInitials(person)}</span>
+                <span className={`avatar gender-${person.gender}`}>
+                  {getInitials(person)}
+                  <span className={`state-dot ${person.wellbeing}`} aria-hidden="true" />
+                </span>
                 <span>
                   <strong>{getFullName(person)}</strong>
                   <small>{person.location || "Location unknown"}</small>
@@ -440,8 +467,12 @@ function App() {
           {selectedPerson ? (
             <>
               <section className="profile-head">
-                <div className={`profile-avatar ${selectedPerson.wellbeing}`}>
+                <div className={`profile-avatar gender-${selectedPerson.gender}`}>
                   {getInitials(selectedPerson)}
+                  <span
+                    className={`state-dot large ${selectedPerson.wellbeing}`}
+                    aria-hidden="true"
+                  />
                 </div>
                 <div>
                   <p className="eyebrow">{selectedPerson.nickname || "Selected profile"}</p>
@@ -902,6 +933,23 @@ function App() {
                             {label}
                           </option>
                         ))}
+                      </select>
+                    </label>
+                    <label className="field">
+                      <span>Gender</span>
+                      <select
+                        value={relationshipDraft.gender}
+                        onChange={(event) =>
+                          setRelationshipDraft((draft) => ({
+                            ...draft,
+                            gender: event.target.value as Person["gender"],
+                          }))
+                        }
+                      >
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="nonbinary">Nonbinary</option>
+                        <option value="unknown">Unknown</option>
                       </select>
                     </label>
                     <label className="field">
@@ -1430,17 +1478,32 @@ function FamilyTree({
               }}
             >
               <rect
+                className="tree-node-bg"
                 x={position.x}
                 y={position.y}
                 rx="8"
                 width={cardWidth}
                 height={cardHeight}
               />
+              <rect
+                className="tree-gender-band"
+                x={position.x}
+                y={position.y}
+                rx="8"
+                width="8"
+                height={cardHeight}
+              />
               <circle
-                className={`tree-avatar ${person.wellbeing}`}
+                className={`tree-avatar gender-${person.gender}`}
                 cx={position.x + 34}
                 cy={position.y + 34}
                 r="20"
+              />
+              <circle
+                className={`tree-state-dot ${person.wellbeing}`}
+                cx={position.x + 49}
+                cy={position.y + 49}
+                r="6"
               />
               <text className="tree-initials" x={position.x + 34} y={position.y + 40}>
                 {getInitials(person)}
@@ -1452,7 +1515,10 @@ function FamilyTree({
                 {vitalLabels[person.vitalStatus]}{age !== null ? ` · ${age}` : ""}
               </text>
               <text className="tree-sub" x={position.x + 18} y={position.y + 76}>
-                {trimText(wellbeingLabels[person.wellbeing], 20)}
+                {trimText(
+                  `${genderLabels[person.gender]} · ${wellbeingLabels[person.wellbeing]}`,
+                  24,
+                )}
               </text>
             </g>
           );
