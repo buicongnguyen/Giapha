@@ -12,6 +12,7 @@ import {
   Link2,
   LockKeyhole,
   MapPin,
+  Maximize2,
   Plus,
   RotateCcw,
   Save,
@@ -21,6 +22,8 @@ import {
   Upload,
   UserRoundPlus,
   UsersRound,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
@@ -1351,6 +1354,7 @@ function FamilyTree({
   selectedPersonId: string;
   onSelect: (personId: string) => void;
 }) {
+  const [zoom, setZoom] = useState(0.85);
   const generationMap = useMemo(() => getGenerations(allPeople), [allPeople]);
   const peopleById = useMemo(() => new Map(people.map((person) => [person.id, person])), [people]);
   const grouped = useMemo(() => {
@@ -1403,12 +1407,52 @@ function FamilyTree({
     return <div className="empty-state">No profiles match the current filters.</div>;
   }
 
+  const zoomPercent = Math.round(zoom * 100);
+  const setBoundedZoom = (nextZoom: number) => {
+    setZoom(Math.min(1.5, Math.max(0.5, Number(nextZoom.toFixed(2)))));
+  };
+
   return (
-    <div className="tree-scroll">
+    <div className="tree-stage">
+      <div className="tree-toolbar" aria-label="Tree zoom controls">
+        <button
+          className="icon-button"
+          onClick={() => setBoundedZoom(zoom - 0.1)}
+          title="Zoom out"
+          type="button"
+        >
+          <ZoomOut aria-hidden="true" size={17} />
+        </button>
+        <button
+          className="icon-button"
+          onClick={() => setBoundedZoom(zoom + 0.1)}
+          title="Zoom in"
+          type="button"
+        >
+          <ZoomIn aria-hidden="true" size={17} />
+        </button>
+        <button
+          className="icon-button"
+          onClick={() => setBoundedZoom(0.62)}
+          title="Fit big picture"
+          type="button"
+        >
+          <Maximize2 aria-hidden="true" size={17} />
+        </button>
+        <button
+          className="zoom-button"
+          onClick={() => setBoundedZoom(0.85)}
+          type="button"
+          title="Reset zoom"
+        >
+          {zoomPercent}%
+        </button>
+      </div>
+      <div className="tree-scroll">
       <svg
         className="tree-canvas"
-        width={width}
-        height={height}
+        width={Math.round(width * zoom)}
+        height={Math.round(height * zoom)}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label="Interactive family tree"
@@ -1465,7 +1509,9 @@ function FamilyTree({
           const age = calculateAge(person);
           return (
             <g
-              className={`tree-card ${person.id === selectedPersonId ? "selected" : ""}`}
+              className={`tree-card gender-${person.gender} ${
+                person.id === selectedPersonId ? "selected" : ""
+              }`}
               key={person.id}
               onClick={() => onSelect(person.id)}
               tabIndex={0}
@@ -1524,6 +1570,7 @@ function FamilyTree({
           );
         })}
       </svg>
+      </div>
     </div>
   );
 }
