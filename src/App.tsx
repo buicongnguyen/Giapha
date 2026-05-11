@@ -1415,6 +1415,7 @@ function FamilyTree({
   return (
     <div className="tree-stage">
       <div className="tree-toolbar" aria-label="Tree zoom controls">
+        <span className="tree-toolbar-label">Zoom</span>
         <button
           className="icon-button"
           onClick={() => setBoundedZoom(zoom - 0.1)}
@@ -1432,12 +1433,13 @@ function FamilyTree({
           <ZoomIn aria-hidden="true" size={17} />
         </button>
         <button
-          className="icon-button"
+          className="fit-button"
           onClick={() => setBoundedZoom(0.62)}
           title="Fit big picture"
           type="button"
         >
           <Maximize2 aria-hidden="true" size={17} />
+          Fit
         </button>
         <button
           className="zoom-button"
